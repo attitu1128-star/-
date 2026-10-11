@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>成語練習場</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#fff8e7;--ink:#2b2a33;--card:#ffffff;--a:#2a9d8f;--b:#f4a261;--ok:#2e9e5b;--no:#d6453d;--line:#e8dcc0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1f2326;--ink:#f1ece0;--card:#2b3135;--a:#4cc3b3;--b:#f4a261;--line:#434b50}}
+:root[data-theme="dark"]{--bg:#1f2326;--ink:#f1ece0;--card:#2b3135;--a:#4cc3b3;--b:#f4a261;--line:#434b50}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;line-height:1.7}
+header{padding:28px 16px 8px;text-align:center}
+h1{margin:0;font-size:2rem;letter-spacing:.15em}
+nav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:12px}
+nav button{font:inherit;border:2px solid var(--a);background:var(--card);color:var(--ink);padding:8px 16px;border-radius:999px;cursor:pointer}
+nav button.on{background:var(--a);color:#fff}
+main{max-width:900px;margin:0 auto;padding:8px 16px 48px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px}
+.pic{font-size:3rem;text-align:center;background:var(--bg);border-radius:14px;padding:10px;letter-spacing:.1em}
+.card h3{margin:10px 0 2px;font-size:1.5rem;letter-spacing:.12em;color:var(--a)}
+.card p{margin:4px 0;font-size:.95rem}
+.eg{color:var(--b);font-size:.9rem}
+.q{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:22px;margin-top:12px}
+.q .t{font-size:1.3rem;margin-bottom:14px}
+.q .big{font-size:2.2rem;color:var(--a);letter-spacing:.15em;text-align:center}
+.opts{display:grid;gap:10px}
+.opts button{font:inherit;text-align:left;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;font-size:1.05rem}
+.opts button:hover:not(:disabled){border-color:var(--a)}
+.opts button.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.opts button.no{background:var(--no);color:#fff;border-color:var(--no)}
+.bar{display:flex;justify-content:space-between;margin-top:10px;font-size:.95rem}
+.next{margin-top:14px;font:inherit;background:var(--b);color:#2b2a33;border:0;padding:10px 22px;border-radius:999px;cursor:pointer;font-weight:700}
+.sub{display:flex;gap:8px;margin-bottom:14px}.sub button{font:inherit;border:2px solid var(--b);background:var(--card);color:var(--ink);padding:6px 14px;border-radius:999px;cursor:pointer}.sub button.on{background:var(--b);color:#2b2a33}
+.fb{min-height:1.6em;margin-top:10px;font-weight:700}
+button:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+</style>
+</head>
+<body>
+<header><h1>成語練習場</h1><div>認識成語 · 選詞填空 · 選擇釋義 · 進階挑戰</div></header>
+<nav><button data-p="0" class="on">1 認識成語</button><button data-p="1">2 選詞填空</button><button data-p="2">3 選擇釋義</button><button data-p="3">4 進階挑戰</button></nav>
+<main id="app"></main>
+<script>
+const D=[
+["全力以赴","用盡所有力量去做一件事。","😤🏃💪","比賽就要開始了，選手們都＿＿，希望拿到好成績。"],
+["驚慌失措","因為害怕慌張，不知道該怎麼辦。","😱🏃💦","地震突然發生，小朋友們嚇得＿＿。"],
+["喜不自禁","高興得無法控制自己。","🥳🎉🎈","聽到自己得到第一名，小明＿＿地跳了起來。"],
+["聚精會神","集中精神，非常專心。","🧐📖✨","上課時，同學們＿＿地聽老師講故事。"],
+["一筆一畫","每一筆都很認真，一點也不馬虎。","✍️📝🖌️","他＿＿地練習寫毛筆字，一個字也不馬虎。"],
+["無聲無息","沒有一點聲音，安安靜靜的。","🤫🐈🌙","小貓＿＿地走到沙發旁，大家都沒發現。"],
+["腳踏實地","做事踏實認真，不好高騖遠。","👣⛰️🌱","想要成功，就要＿＿，一步一步努力。"],
+["狂風暴雨","又大又猛的風和雨。","🌪️🌧️⚡","颱風來襲，外面＿＿，大家都待在家裡。"],
+["堅定不移","意志穩固，絕不改變。","🧱🚩💪","他的立場＿＿，無論別人怎麼勸都不改變。"],
+["腰酸背痛","腰和背又酸又痛，形容身體很累。","😫🪑💢","搬了一整天的東西，爸爸累得＿＿。"],
+["任勞任怨","不怕辛苦，也不抱怨。","🧹🙂🍳","媽媽每天＿＿地照顧全家人。"],
+["堅毅不拔","意志堅強，不會被困難打倒。","🧗🏔️🔥","山路又陡又長，他靠著＿＿的精神爬上了山頂。"],
+["脫穎而出","本領出眾，從許多人中顯現出來。","🌟🏆👥","他在比賽中表現優異，從許多參賽者中＿＿。"],
+["精益求精","已經很好了，還想要更好。","🔧📈🍞","這位師傅做的麵包已經很好吃了，還是＿＿，不斷改良。"],
+["不可或缺","非常重要，一定要有。","🔑💧🌞","水是生命中＿＿的東西。"],
+["不假思索","不需要多想，馬上就回答或行動。","⚡💭🙋","老師一問，他＿＿就舉手回答。"],
+["獨具一格","有自己獨特的風格。","🎨✨🦄","這位畫家的作品＿＿，一眼就能認出來。"],
+["舉世聞名","全世界的人都知道。","🌍🗼📣","萬里長城是＿＿的偉大建築。"],
+["融為一體","合在一起，成為分不開的整體。","🎶🤝🎤","合唱團的聲音＿＿，聽起來非常和諧。"]
+];
+const E=[
+["大聲疾呼","大聲地呼喊，希望引起大家注意。","📢😠🙋","環保人士＿＿，希望大家一起減少使用塑膠袋。"],
+["死灰復燃","已熄滅的火又燃燒起來，比喻壞事或衰敗的勢力重新活動。","🔥⚫🔄","大家以為疫情已經結束，沒想到病毒竟然＿＿。"],
+["碩果僅存","珍貴的東西，只剩下少數留存下來。","🍎🌳1️⃣","這家百年老店是當地＿＿的傳統糕餅店。"],
+["集思廣益","集合大家的想法，產生更好的效果。","💡👥💡","為了辦好園遊會，全班＿＿，想出許多好點子。"],
+["寄人籬下","依靠別人生活，不能自主。","🏠🧍😔","他從小父母雙亡，只能＿＿，看親戚的臉色過日子。"],
+["赴湯蹈火","不怕危險困難，什麼都肯做。","🔥🌊🦸","為了救朋友，他＿＿也在所不惜。"],
+["德高望重","品德高尚，聲望很大，受人尊敬。","👴🏅🙇","校長＿＿，受到全校師生的愛戴。"],
+["微乎其微","非常少、非常小。","🔬🤏🐜","他沒念書就想考一百分，成功的機會＿＿。"],
+["哀鴻遍野","災民流離失所，到處是哀苦的人。","🌊🏚️😢","大地震過後，災區＿＿，急需各界援助。"],
+["抱殘守缺","守著舊東西不肯改變，不知變通。","📜🔒🙅","做生意如果＿＿，不肯改進，很快就會被淘汰。"],
+["同流合汙","跟著壞人一起做壞事。","🌊🦹🤝","他個性正直，絕不和壞人＿＿。"],
+["當機立斷","在關鍵時刻，立刻做出決定。","⚡✂️🧠","火災發生時，消防員＿＿，立刻衝進去救人。"],
+["疾風勁草","在艱難的考驗中，才看得出誰是堅強可靠的人。","🌬️🌿💪","＿＿，在最困難的時候，只有他沒有離開我們。"],
+["隱惡揚善","不說別人的缺點，只稱讚別人的優點。","🤐👍😇","他總是＿＿，從不在背後批評別人。"],
+["暗箭傷人","在暗地裡用卑鄙的手段陷害別人。","🏹🌑😈","他在背後散布謠言，這種＿＿的行為真令人不齒。"],
+["適可而止","做到恰當的程度就停止，不要過度。","✋📏🎮","玩遊戲要＿＿，不要玩到忘記寫功課。"],
+["羽毛未豐","比喻年紀小，能力、經驗還不夠成熟。","🐥🪶🌱","他剛進公司，還＿＿，需要前輩多多指導。"],
+["百折不撓","無論受到多少挫折，都不退縮。","🌱🪨💥","他＿＿，失敗了十次還是繼續嘗試。"],
+["養精蓄銳","保養精神，積蓄力量，準備行動。","😴🔋💪","比賽前一天，選手們早早休息，＿＿。"],
+["飲水思源","喝水時想到水的來源，比喻不忘本，懂得感恩。","🚰🌊🙏","我們要＿＿，不忘老師的栽培。"],
+["養尊處優","處在受人尊敬、舒適的環境中，過著安逸的生活。","👑🛋️🍰","他從小＿＿，什麼粗重的工作都沒做過。"],
+["義正詞嚴","道理正當，措辭嚴正，態度堅定。","⚖️🗣️👆","他＿＿地拒絕了不合理的要求。"],
+["汗馬功勞","戰場上立下的功勞，也指辛苦的功績。","🐎💦🏅","這次比賽獲勝，教練有很大的＿＿。"],
+["怨聲載道","百姓到處都在抱怨、不滿。","😠😡🗣️","新政策實施後，民眾＿＿。"],
+["沽名釣譽","用手段騙取名聲。","🎣🏆🎭","他捐款只是為了＿＿，並不是真心幫助別人。"],
+["當務之急","目前最急迫、最該做的事。","🚨📌⏰","火災現場，＿＿是先把受困的人救出來。"],
+["三令五申","再三地命令和告誡。","📜📜📜","老師＿＿不可以在走廊奔跑，還是有人違規。"],
+["歷歷在目","過去的事情清楚地出現在眼前。","🧠🖼️👀","畢業典禮的畫面，至今仍＿＿。"],
+["出奇制勝","用出人意料的方法取得勝利。","♟️💡🏆","他用一招＿＿的戰術，打敗了強大的對手。"],
+["橫行霸道","仗勢欺人，蠻橫不講理。","😈🚜👊","那個壞人在街上＿＿，欺負弱小。"],
+["引經據典","引用經書和典故來說明或證明。","📚🗣️📖","演講者＿＿，讓演說更有說服力。"],
+["責無旁貸","自己的責任，不能推給別人。","🙋🎯📋","身為班長，維持班上秩序是我＿＿的事。"],
+["孤掌難鳴","一個巴掌拍不響，比喻力量薄弱，難以成事。","👋🔇😞","沒有人幫忙，他一個人＿＿，什麼事也做不成。"],
+["漸入佳境","情況越來越好，興趣越來越濃。","📈🌄😊","這部電影前半段普通，後半段＿＿，越看越精彩。"],
+["上行下效","上面的人怎麼做，下面的人就跟著學。","👨‍👧👶👣","父母常說髒話，孩子也跟著學，這就是＿＿。"],
+["以貌取人","只憑外表來評斷別人。","👀🤵❌","不可以＿＿，外表看不出一個人的好壞。"]
+];
+const G=[["堅定不移","堅毅不拔","百折不撓"]];
+
+const app=document.getElementById('app');
+const sh=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const grp=w=>G.find(g=>g.includes(w))||[w];
+function pick(pool,d,f){const g=grp(d[0]);return sh(pool.filter(x=>!g.includes(x[0]))).slice(0,3).map(x=>x[f])}
+let page=0,lv=0;
+const tabs=[()=>learn(),()=>run(D,1),()=>run(D,2),()=>run(E,3,20)];
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{page=+b.dataset.p;document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));tabs[page]()});
+function learn(){
+ const L=lv?E:D;
+ app.innerHTML=`<div class="sub"><button class="${lv?'':'on'}" data-l="0">基礎成語（${D.length}）</button><button class="${lv?'on':''}" data-l="1">進階成語（${E.length}）</button></div><div class="grid">`+L.map(d=>`<div class="card"><div class="pic" role="img" aria-label="${d[0]}插圖">${d[2]}</div><h3>${d[0]}</h3><p>${d[1]}</p><p class="eg">例：${d[3].replace('＿＿','<b>'+d[0]+'</b>')}</p></div>`).join('')+'</div>';
+ app.querySelectorAll('.sub button').forEach(b=>b.onclick=()=>{lv=+b.dataset.l;learn()});
+}
+function run(pool,mode,cnt){
+ let order=sh(pool.map((_,i)=>i)).slice(0,cnt||pool.length),n=0,score=0;
+ function show(){
+  if(n>=order.length){app.innerHTML=`<div class="q"><div class="big">完成！</div><p style="text-align:center;font-size:1.4rem">答對 ${score} / ${order.length} 題</p><p style="text-align:center">${score>=order.length*.9?'太棒了，你是成語小達人！':score>=order.length*.65?'很不錯，再練習一次會更好！':'回到「認識成語」複習一下，再來挑戰吧！'}</p><div style="text-align:center"><button class="next" id="again">再玩一次</button></div></div>`;
+   document.getElementById('again').onclick=()=>run(pool,mode,cnt);return}
+  const d=pool[order[n]],m=mode==3?(Math.random()<.5?1:2):mode;
+  const ans=m==1?d[0]:d[1];
+  const opts=sh([ans,...pick(pool,d,m==1?0:1)]);
+  app.innerHTML=`<div class="q"><div class="bar"><span>第 ${n+1} / ${order.length} 題</span><span>得分：${score}</span></div>`+
+   (m==1?`<div class="t">請選出最適合填入空格的成語：<br>${d[3]}</div>`:`<div class="t">請選出正確的釋義：</div><div class="big">${d[0]}</div><br>`)+
+   `<div class="opts">${opts.map(o=>`<button>${o}</button>`).join('')}</div><div class="fb"></div></div>`;
+  const bs=[...app.querySelectorAll('.opts button')],fb=app.querySelector('.fb');
+  bs.forEach(b=>b.onclick=()=>{
+   const right=b.textContent===ans;
+   bs.forEach(x=>{x.disabled=true;if(x.textContent===ans)x.classList.add('ok')});
+   if(right){score++;fb.textContent='🎉 答對了！'}else{b.classList.add('no');fb.textContent='❌ 答錯了，綠色的是正確答案。'}
+   const nx=document.createElement('button');nx.className='next';nx.textContent=n==order.length-1?'看結果':'下一題';nx.onclick=()=>{n++;show()};app.querySelector('.q').appendChild(nx);nx.focus();
+  });
+ }
+ show();
+}
+learn();
+</script>
+</body>
+</html>
